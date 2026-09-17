@@ -1,13 +1,30 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { sampleCompany } from "./domain/fixtures/sampleCompany";
 import { App } from "./App";
 
 describe("App", () => {
-  it("renders the Clients page shell", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("renders the Clients page shell and chart after load", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => sampleCompany,
+      }),
+    );
+
     render(<App />);
 
     expect(screen.getByRole("heading", { name: "Clients" })).toBeInTheDocument();
     expect(screen.getByLabelText("Client acquisition over time")).toBeInTheDocument();
     expect(screen.getByLabelText("Client detail by month")).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("clients-chart")).toBeInTheDocument();
+    });
   });
 });

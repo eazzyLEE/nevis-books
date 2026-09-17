@@ -39,11 +39,24 @@
 
 .placeholder {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.75rem;
   min-height: 10rem;
+  margin: 0;
   color: var(--color-text-muted);
   font-size: 0.875rem;
   border: 1px dashed var(--color-border);
   border-radius: calc(var(--radius-card) - 4px);
+}
+
+.placeholder button {
+  font: inherit;
+  cursor: pointer;
+  color: var(--color-text);
+  background: var(--color-beige);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.4rem 0.85rem;
 }
