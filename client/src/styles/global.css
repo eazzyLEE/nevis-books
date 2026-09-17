@@ -1,7 +1,11 @@
+@import "./tokens.css";
+
 :root {
   color-scheme: light;
-  font-family: "Segoe UI", system-ui, sans-serif;
+  font-family: var(--font-sans);
   line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-page);
 }
 
 *,
@@ -13,6 +17,6 @@
 body {
   margin: 0;
   min-width: 320px;
-  background: #f7f3ea;
-  color: #1a1a1a;
+  background: var(--color-page);
+  color: var(--color-text);
 }

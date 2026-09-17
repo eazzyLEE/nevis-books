@@ -1,0 +1,42 @@
+/**
+ * Design tokens for Nevis Books.
+ * Neutrals from neviswealth.com; product accents from the take-home design.
+ */
+
+:root {
+  /* Nevis marketing neutrals */
+  --color-beige: #f7f6f0;
+  --color-black: #141413;
+  --color-white: #ffffff;
+
+  /* Text hierarchy */
+  --color-text: var(--color-black);
+  --color-text-muted: rgba(20, 20, 19, 0.64);
+  --color-border: rgba(20, 20, 19, 0.12);
+
+  /* Surfaces */
+  --color-surface: var(--color-white);
+  --color-surface-zebra: rgba(20, 20, 19, 0.04);
+  --color-page: var(--color-beige);
+
+  /* Product accent (assignment Clients title / diamond) */
+  --color-accent: #8326c9;
+  --color-accent-soft: #f1e7f8;
+  --color-accent-strong: #522277;
+
+  /* Chart stacks — Existing / New organic / New paid */
+  --color-channel-existing: #c9b8e8;
+  --color-channel-organic: #f0c4d8;
+  --color-channel-paid: #b76e7e;
+
+  /* Optional Nevis marketing amber (not used for product chrome by default) */
+  --color-amber: #ff9603;
+
+  /* Typography */
+  --font-sans: Inter, "Segoe UI", system-ui, sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+
+  /* Spacing / radius */
+  --radius-card: 12px;
+  --space-page: 1.5rem;
+}
