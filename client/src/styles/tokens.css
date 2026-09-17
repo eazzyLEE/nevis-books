@@ -14,9 +14,9 @@
   --color-text-muted: rgba(20, 20, 19, 0.64);
   --color-border: rgba(20, 20, 19, 0.12);
 
-  /* Surfaces */
+  /* Surfaces — zebra must be opaque so sticky columns don't show through */
   --color-surface: var(--color-white);
-  --color-surface-zebra: rgba(20, 20, 19, 0.04);
+  --color-surface-zebra: #f3f2ed;
   --color-page: var(--color-beige);
 
   /* Product accent (assignment Clients title / diamond) */

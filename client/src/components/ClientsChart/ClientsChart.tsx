@@ -11,10 +11,10 @@ import {
 import type { ChartSeries } from "../../domain/chartSeries";
 import {
   fillForSeriesIndex,
-  formatMonthTick,
   toRechartsRows,
 } from "./chartPresentation";
 import { resolveChartTheme } from "./chartTheme";
+import { formatMonthTick } from "../../formatting/formatMonthTick";
 import styles from "./ClientsChart.module.css";
 
 export interface ClientsChartProps {

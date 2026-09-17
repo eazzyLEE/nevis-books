@@ -8,7 +8,7 @@ describe("App", () => {
     vi.unstubAllGlobals();
   });
 
-  it("renders the Clients page shell and chart after load", async () => {
+  it("renders the Clients page with chart and table after load", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
@@ -25,6 +25,8 @@ describe("App", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("clients-chart")).toBeInTheDocument();
+      expect(screen.getByText("Company")).toBeInTheDocument();
+      expect(screen.getByText("Branch 1")).toBeInTheDocument();
     });
   });
 });

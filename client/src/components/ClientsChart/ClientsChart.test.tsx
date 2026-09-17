@@ -6,12 +6,9 @@ import {
   sampleCompany,
 } from "../../domain/fixtures/sampleCompany";
 import { ClientsChart } from "./ClientsChart";
-import {
-  fillForSeriesIndex,
-  formatMonthTick,
-  toRechartsRows,
-} from "./chartPresentation";
+import { fillForSeriesIndex, toRechartsRows } from "./chartPresentation";
 import { CHART_THEME_FALLBACKS } from "./chartTheme";
+import { formatMonthTick } from "../../formatting/formatMonthTick";
 
 describe("chartPresentation", () => {
   it("flattens domain points for Recharts", () => {
