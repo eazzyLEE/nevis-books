@@ -7,7 +7,7 @@ import {
 } from "../../domain/fixtures/sampleCompany";
 import { ClientsChart } from "./ClientsChart";
 import {
-  fillForSeriesKey,
+  fillForSeriesIndex,
   formatMonthTick,
   toRechartsRows,
 } from "./chartPresentation";
@@ -26,21 +26,30 @@ describe("chartPresentation", () => {
     });
   });
 
-  it("maps known channel names to theme fills", () => {
-    expect(fillForSeriesKey("Existing clients", 0, CHART_THEME_FALLBACKS)).toBe(
-      CHART_THEME_FALLBACKS.channelExisting,
-    );
-    expect(fillForSeriesKey("New organic", 1, CHART_THEME_FALLBACKS)).toBe(
-      CHART_THEME_FALLBACKS.channelOrganic,
-    );
-    expect(fillForSeriesKey("New paid", 2, CHART_THEME_FALLBACKS)).toBe(
-      CHART_THEME_FALLBACKS.channelPaid,
+  it("cycles palette fills by series index", () => {
+    const palette = CHART_THEME_FALLBACKS.seriesPalette;
+
+    expect(fillForSeriesIndex(0, CHART_THEME_FALLBACKS)).toBe(palette[0]);
+    expect(fillForSeriesIndex(1, CHART_THEME_FALLBACKS)).toBe(palette[1]);
+    expect(fillForSeriesIndex(2, CHART_THEME_FALLBACKS)).toBe(palette[2]);
+    expect(fillForSeriesIndex(palette.length, CHART_THEME_FALLBACKS)).toBe(
+      palette[0],
     );
   });
 
   it("abbreviates month labels for narrow charts", () => {
     expect(formatMonthTick("Feb 2024")).toBe("Feb '24");
     expect(formatMonthTick("Jan 2025")).toBe("Jan '25");
+  });
+});
+
+describe("resolveChartTheme", () => {
+  it("loads the series palette from CSS tokens when present", async () => {
+    const { resolveChartTheme } = await import("./chartTheme");
+    const theme = resolveChartTheme();
+
+    expect(theme.seriesPalette.length).toBeGreaterThanOrEqual(3);
+    expect(theme.seriesPalette[0]).toBe("#c9b8e8");
   });
 });
 

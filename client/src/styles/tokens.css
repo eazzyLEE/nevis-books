@@ -24,19 +24,19 @@
   --color-accent-soft: #f1e7f8;
   --color-accent-strong: #522277;
 
-  /* Chart stacks — Existing / New organic / New paid */
-  --color-channel-existing: #c9b8e8;
-  --color-channel-organic: #f0c4d8;
-  --color-channel-paid: #b76e7e;
+  /* Chart series palette — add --color-chart-series-N to extend; JS reads until a gap */
+  --color-chart-series-1: #c9b8e8;
+  --color-chart-series-2: #f0c4d8;
+  --color-chart-series-3: #b76e7e;
+  --color-chart-series-4: #8e8e8e;
+  --color-chart-series-5: #b4b4b3;
+  --color-chart-series-6: #c8c8c8;
 
   /* Chart chrome (Recharts reads these via resolveChartTheme) */
   --color-chart-grid: var(--color-border);
   --color-chart-tick: var(--color-text-muted);
   --color-chart-axis: var(--color-border);
   --color-chart-cursor: var(--color-surface-zebra);
-  --color-chart-fallback-1: #8e8e8e;
-  --color-chart-fallback-2: #b4b4b3;
-  --color-chart-fallback-3: #c8c8c8;
 
   /* Optional Nevis marketing amber (not used for product chrome by default) */
   --color-amber: #ff9603;

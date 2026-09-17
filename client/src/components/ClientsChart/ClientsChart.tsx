@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import type { ChartSeries } from "../../domain/chartSeries";
 import {
-  fillForSeriesKey,
+  fillForSeriesIndex,
   formatMonthTick,
   toRechartsRows,
 } from "./chartPresentation";
@@ -71,14 +71,17 @@ export function ClientsChart({ series }: ClientsChartProps) {
           <Legend
             verticalAlign="bottom"
             iconType="circle"
-            wrapperStyle={{ paddingTop: 12, fontSize: 12 }}
+            wrapperStyle={{ paddingTop: 12 }}
+            formatter={(value) => (
+              <span className={styles.legendLabel}>{value}</span>
+            )}
           />
           {series.seriesKeys.map((seriesKey, seriesIndex) => (
             <Bar
               key={seriesKey}
               dataKey={seriesKey}
               stackId="acquisition"
-              fill={fillForSeriesKey(seriesKey, seriesIndex, theme)}
+              fill={fillForSeriesIndex(seriesIndex, theme)}
               maxBarSize={48}
             />
           ))}

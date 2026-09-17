@@ -13,7 +13,7 @@ export interface ChartMonthPoint {
 
 export interface ChartSeries {
   points: ChartMonthPoint[];
-  /** Stack order (first-seen channel names while walking the tree). */
+  /** Stack order: first-seen channel names (drives chart fill index). */
   seriesKeys: readonly string[];
 }
 
@@ -39,8 +39,12 @@ function createEmptyMonthTotals(): number[] {
  * Builds stacked chart series by summing acquisition channels with the same
  * name across the company tree.
  *
- * Only channel nodes carry Existing / New organic / New paid breakdowns.
- * If the tree has no channels, returns an empty series.
+ * Only channel nodes carry acquisition breakdowns. If the tree has no
+ * channels, returns an empty series.
+ *
+ * `seriesKeys` order is first-seen while walking the tree. Chart fills are
+ * assigned by that index, so reordering discovery can change colors for a
+ * given channel name.
  */
 export function buildChartSeries(company: Company): ChartSeries {
   const channels = listAcquisitionChannels(company);

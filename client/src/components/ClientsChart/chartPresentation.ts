@@ -14,22 +14,17 @@ export function formatMonthTick(month: string): string {
   return `${match[1]} '${match[2].slice(2)}`;
 }
 
-export function fillForSeriesKey(
-  seriesKey: string,
+/**
+ * Picks a stack fill by series index so new channel names get a color
+ * without hard-coding labels.
+ */
+export function fillForSeriesIndex(
   seriesIndex: number,
   theme: ChartTheme = resolveChartTheme(),
 ): string {
-  const fillByName: Record<string, string> = {
-    "Existing clients": theme.channelExisting,
-    "New organic": theme.channelOrganic,
-    "New paid": theme.channelPaid,
-  };
+  const palette = theme.seriesPalette;
 
-  return (
-    fillByName[seriesKey] ??
-    theme.fallbackFills[seriesIndex % theme.fallbackFills.length] ??
-    theme.fallbackFills[0]
-  );
+  return palette[seriesIndex % palette.length] ?? palette[0]!;
 }
 
 /** Flattens domain chart points into Recharts row objects. */
