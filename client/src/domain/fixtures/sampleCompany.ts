@@ -1,11 +1,32 @@
 import type { Company } from "@nevis-books/shared";
 
+/** Minimal company with no acquisition channels (chart empty-series case). */
+export const companyWithoutChannels: Company = {
+  id: "company-empty-channels",
+  name: "Company",
+  values: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+  branches: [
+    {
+      id: "branch-1",
+      name: "Branch 1",
+      values: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+      employees: [
+        {
+          id: "employee-1",
+          name: "Alex Example",
+          values: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+        },
+      ],
+    },
+  ],
+};
+
 /**
- * Company tree served by GET /api/clients.
- * Uneven nesting is intentional: Branch 2/3 have no employees;
+ * Full company tree for domain unit tests (chart + table).
+ * Matches the API payload: Branch 2/3 have no employees;
  * only Anna Blackwood has acquisition channels.
  */
-export const companyClients: Company = {
+export const sampleCompany: Company = {
   id: "d6e00056-dce4-4ef4-b034-d6467db6187d",
   name: "Company",
   values: [250, 267, 284, 301, 317, 334, 350, 250, 250, 250, 250, 350],
