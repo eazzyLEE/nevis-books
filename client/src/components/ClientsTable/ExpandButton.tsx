@@ -2,15 +2,10 @@ import styles from "./ExpandButton.module.css";
 
 export interface ExpandButtonProps {
   expanded: boolean;
-  /** Visible row name used in the accessible label. */
   label: string;
   onToggle: () => void;
 }
 
-/**
- * Chevron control for expanding or collapsing a tree row.
- * Owns no tree state — parent passes `expanded` and handles `onToggle`.
- */
 export function ExpandButton({ expanded, label, onToggle }: ExpandButtonProps) {
   const action = expanded ? "Collapse" : "Expand";
 

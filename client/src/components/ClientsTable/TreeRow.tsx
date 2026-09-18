@@ -7,17 +7,9 @@ import styles from "./TreeRow.module.css";
 export interface TreeRowProps {
   row: TableRow;
   expanded: boolean;
-  /** Required when `row.hasChildren` is true; ignored for leaves. */
   onToggleExpand?: () => void;
 }
 
-/**
- * One hierarchical table row: expand control, label, and monthly values.
- * Presentational — parent supplies expand state and toggle handler.
- *
- * `aria-expanded` stays on the row for hierarchy semantics; the nested
- * ExpandButton also exposes it for the control itself.
- */
 export function TreeRow({ row, expanded, onToggleExpand }: TreeRowProps) {
   const showAvatar = row.kind === "employee";
   const rowStyle = {
@@ -25,12 +17,7 @@ export function TreeRow({ row, expanded, onToggleExpand }: TreeRowProps) {
   } as CSSProperties;
 
   return (
-    <tr
-      className={styles.row}
-      style={rowStyle}
-      aria-level={row.depth + 1}
-      aria-expanded={row.hasChildren ? expanded : undefined}
-    >
+    <tr className={styles.row} style={rowStyle} aria-level={row.depth + 1}>
       <th scope="row" className={styles.nameCell}>
         <div className={styles.nameContent}>
           <span className={styles.expandSlot}>

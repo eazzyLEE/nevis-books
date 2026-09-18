@@ -2,11 +2,6 @@ import type { Company, MonthlyValues } from "@nevis-books/shared";
 
 export type TableRowKind = "company" | "branch" | "employee" | "channel";
 
-/**
- * One visible table row after applying expand state.
- * Indent with `depth`; derive open/closed via `expandedIds.has(id)` —
- * expansion is not stored on the row.
- */
 export interface TableRow {
   id: string;
   name: string;
@@ -17,16 +12,9 @@ export interface TableRow {
   kind: TableRowKind;
 }
 
-function hasItems<T>(items: readonly T[] | undefined): items is readonly T[] {
-  return Array.isArray(items) && items.length > 0;
-}
-
 /**
- * Flattens the company tree into the rows currently visible in the table.
- * Children appear only when their parent id is present in `expandedIds`.
- * Expanded ids for nodes that are not currently reachable (e.g. a branch id
- * without the company expanded) are ignored.
- * Nodes without children get `hasChildren: false` (no expand control in the UI).
+ * Flatten the company tree to rows visible under `expandedIds`.
+ * Expanded ids that aren't reachable (parent collapsed) are ignored.
  */
 export function buildVisibleRows(
   company: Company,
@@ -49,7 +37,7 @@ export function buildVisibleRows(
 
   for (const branch of company.branches) {
     const employees = branch.employees;
-    const branchHasEmployees = hasItems(employees);
+    const branchHasEmployees = (employees?.length ?? 0) > 0;
 
     rows.push({
       id: branch.id,
@@ -60,13 +48,13 @@ export function buildVisibleRows(
       kind: "branch",
     });
 
-    if (!expandedIds.has(branch.id) || !branchHasEmployees) {
+    if (!expandedIds.has(branch.id) || !employees || !branchHasEmployees) {
       continue;
     }
 
     for (const employee of employees) {
       const channels = employee.channels;
-      const employeeHasChannels = hasItems(channels);
+      const employeeHasChannels = (channels?.length ?? 0) > 0;
 
       rows.push({
         id: employee.id,
@@ -77,7 +65,7 @@ export function buildVisibleRows(
         kind: "employee",
       });
 
-      if (!expandedIds.has(employee.id) || !employeeHasChannels) {
+      if (!expandedIds.has(employee.id) || !channels || !employeeHasChannels) {
         continue;
       }
 

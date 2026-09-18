@@ -7,13 +7,12 @@ import {
 
 export interface ChartMonthPoint {
   month: MonthLabel;
-  /** Totals for each series key in this month. */
   valuesBySeriesKey: Readonly<Record<string, number>>;
 }
 
 export interface ChartSeries {
   points: ChartMonthPoint[];
-  /** Stack order: first-seen channel names (drives chart fill index). */
+  /** First-seen channel names; chart fills follow this index order. */
   seriesKeys: readonly string[];
 }
 
@@ -31,20 +30,9 @@ function listAcquisitionChannels(company: Company): AcquisitionChannel[] {
   return channels;
 }
 
-function createEmptyMonthTotals(): number[] {
-  return Array.from({ length: MONTH_LABELS.length }, () => 0);
-}
-
 /**
- * Builds stacked chart series by summing acquisition channels with the same
- * name across the company tree.
- *
- * Only channel nodes carry acquisition breakdowns. If the tree has no
- * channels, returns an empty series.
- *
- * `seriesKeys` order is first-seen while walking the tree. Chart fills are
- * assigned by that index, so reordering discovery can change colors for a
- * given channel name.
+ * Stacked chart series by summing channels with the same name.
+ * Empty when the tree has no channel nodes.
  */
 export function buildChartSeries(company: Company): ChartSeries {
   const channels = listAcquisitionChannels(company);
@@ -61,13 +49,12 @@ export function buildChartSeries(company: Company): ChartSeries {
 
     if (!monthTotals) {
       seriesKeys.push(channel.name);
-      monthTotals = createEmptyMonthTotals();
+      monthTotals = Array.from({ length: MONTH_LABELS.length }, () => 0);
       totalsBySeriesName.set(channel.name, monthTotals);
     }
 
     for (let monthIndex = 0; monthIndex < MONTH_LABELS.length; monthIndex += 1) {
-      monthTotals[monthIndex] =
-        (monthTotals[monthIndex] ?? 0) + (channel.values[monthIndex] ?? 0);
+      monthTotals[monthIndex]! += channel.values[monthIndex]!;
     }
   }
 
@@ -75,8 +62,8 @@ export function buildChartSeries(company: Company): ChartSeries {
     const valuesBySeriesKey: Record<string, number> = {};
 
     for (const seriesKey of seriesKeys) {
-      const monthTotals = totalsBySeriesName.get(seriesKey);
-      valuesBySeriesKey[seriesKey] = monthTotals?.[monthIndex] ?? 0;
+      valuesBySeriesKey[seriesKey] =
+        totalsBySeriesName.get(seriesKey)![monthIndex]!;
     }
 
     return { month, valuesBySeriesKey };

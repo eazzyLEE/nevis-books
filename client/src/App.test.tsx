@@ -24,7 +24,11 @@ describe("App", () => {
     expect(screen.getByLabelText("Client detail by month")).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByTestId("clients-chart")).toBeInTheDocument();
+      expect(
+        screen.getByRole("figure", {
+          name: /Client acquisition by channel/,
+        }),
+      ).toBeInTheDocument();
       expect(screen.getByText("Company")).toBeInTheDocument();
       expect(screen.getByText("Branch 1")).toBeInTheDocument();
     });

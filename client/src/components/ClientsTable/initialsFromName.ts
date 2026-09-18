@@ -1,6 +1,3 @@
-/**
- * Builds up to two initials from a display name ("Anna Blackwood" → "AB").
- */
 export function initialsFromName(name: string): string {
   const parts = name
     .trim()

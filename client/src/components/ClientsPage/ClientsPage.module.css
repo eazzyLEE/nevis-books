@@ -65,3 +65,8 @@
   border-radius: 8px;
   padding: 0.4rem 0.85rem;
 }
+
+.placeholder button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

@@ -1,22 +1,10 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { buildChartSeries } from "../../domain/chartSeries";
 import { buildVisibleRows } from "../../domain/tableRows";
 import { useClients } from "../../hooks/useClients";
+import { ClientsChart } from "../ClientsChart";
 import { ClientsTable } from "../ClientsTable";
 import styles from "./ClientsPage.module.css";
-
-const ClientsChart = lazy(async () => {
-  const module = await import("../ClientsChart");
-  return { default: module.ClientsChart };
-});
-
-function ChartLoadingState() {
-  return (
-    <p className={styles.placeholder} role="status">
-      Loading chart…
-    </p>
-  );
-}
 
 function toggleExpandedId(
   current: ReadonlySet<string>,
@@ -31,6 +19,20 @@ function toggleExpandedId(
   }
 
   return next;
+}
+
+function StatusMessage({
+  children,
+  role = "status",
+}: {
+  children: ReactNode;
+  role?: "status" | "alert";
+}) {
+  return (
+    <div className={styles.placeholder} role={role}>
+      {children}
+    </div>
+  );
 }
 
 export function ClientsPage() {
@@ -52,6 +54,18 @@ export function ClientsPage() {
       ? buildVisibleRows(clients.data, activeExpandedIds)
       : [];
 
+  const isLoading = clients.status === "loading";
+
+  const errorBlock =
+    clients.status === "error" ? (
+      <StatusMessage role="alert">
+        <p>{clients.error.message}</p>
+        <button type="button" onClick={clients.retry}>
+          Retry
+        </button>
+      </StatusMessage>
+    ) : null;
+
   return (
     <main className={styles.page}>
       <header className={styles.header}>
@@ -59,46 +73,29 @@ export function ClientsPage() {
         <h1 className={styles.title}>Clients</h1>
       </header>
 
-      <section className={styles.panel} aria-label="Client acquisition over time">
-        {clients.status === "loading" || clients.status === "idle" ? (
-          <ChartLoadingState />
+      <section
+        className={styles.panel}
+        aria-label="Client acquisition over time"
+        aria-busy={isLoading}
+      >
+        {isLoading ? (
+          <StatusMessage>Loading chart…</StatusMessage>
         ) : null}
-
-        {clients.status === "error" ? (
-          <div className={styles.placeholder} role="alert">
-            <p>{clients.error.message}</p>
-            <button type="button" onClick={clients.retry}>
-              Retry
-            </button>
-          </div>
-        ) : null}
-
+        {errorBlock}
         {clients.status === "success" ? (
-          <Suspense fallback={<ChartLoadingState />}>
-            <ClientsChart series={buildChartSeries(clients.data)} />
-          </Suspense>
+          <ClientsChart series={buildChartSeries(clients.data)} />
         ) : null}
       </section>
 
       <section
         className={`${styles.panel} ${styles.tablePanel}`}
         aria-label="Client detail by month"
+        aria-busy={isLoading}
       >
-        {clients.status === "loading" || clients.status === "idle" ? (
-          <p className={styles.placeholder} role="status">
-            Loading table…
-          </p>
+        {isLoading ? (
+          <StatusMessage>Loading table…</StatusMessage>
         ) : null}
-
-        {clients.status === "error" ? (
-          <div className={styles.placeholder} role="alert">
-            <p>{clients.error.message}</p>
-            <button type="button" onClick={clients.retry}>
-              Retry
-            </button>
-          </div>
-        ) : null}
-
+        {errorBlock}
         {clients.status === "success" ? (
           <ClientsTable
             rows={visibleRows}

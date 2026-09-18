@@ -10,10 +10,6 @@ export interface ClientsTableProps {
   onToggleExpand: (rowId: string) => void;
 }
 
-/**
- * Hierarchical clients table shell: sticky name column, month headers,
- * and horizontal scroll for narrow viewports.
- */
 export function ClientsTable({
   rows,
   expandedIds,
@@ -30,14 +26,24 @@ export function ClientsTable({
   return (
     <div className={styles.scroll}>
       <table className={styles.table}>
+        <caption className="visuallyHidden">
+          Client hierarchy with monthly acquisition values
+        </caption>
         <thead>
           <tr>
             <th scope="col" className={styles.cornerHeader}>
-              <span className={styles.visuallyHidden}>Name</span>
+              <span className="visuallyHidden">Name</span>
             </th>
             {MONTH_LABELS.map((month) => (
-              <th key={month} scope="col" className={styles.monthHeader}>
-                <span className={styles.monthFull}>{month}</span>
+              <th
+                key={month}
+                scope="col"
+                className={styles.monthHeader}
+                aria-label={month}
+              >
+                <span className={styles.monthFull} aria-hidden="true">
+                  {month}
+                </span>
                 <span className={styles.monthShort} aria-hidden="true">
                   {formatMonthTick(month)}
                 </span>
@@ -46,24 +52,16 @@ export function ClientsTable({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) =>
-            row.hasChildren ? (
-              <TreeRow
-                key={row.id}
-                row={row}
-                expanded={expandedIds.has(row.id)}
-                onToggleExpand={() => {
-                  onToggleExpand(row.id);
-                }}
-              />
-            ) : (
-              <TreeRow
-                key={row.id}
-                row={row}
-                expanded={expandedIds.has(row.id)}
-              />
-            ),
-          )}
+          {rows.map((row) => (
+            <TreeRow
+              key={row.id}
+              row={row}
+              expanded={expandedIds.has(row.id)}
+              onToggleExpand={() => {
+                onToggleExpand(row.id);
+              }}
+            />
+          ))}
         </tbody>
       </table>
     </div>

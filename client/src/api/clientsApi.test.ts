@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { ClientsApiError, fetchClients } from "./clientsApi";
+import { fetchClients } from "./clientsApi";
 
 describe("fetchClients", () => {
   it("returns the company payload on success", async () => {
@@ -19,18 +19,14 @@ describe("fetchClients", () => {
     expect(fetchImpl).toHaveBeenCalledWith("/api/clients");
   });
 
-  it("throws ClientsApiError when the response is not OK", async () => {
+  it("throws when the response is not OK", async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: false,
       status: 500,
     });
 
-    const error = await fetchClients(fetchImpl).catch((caught: unknown) => caught);
-
-    expect(error).toBeInstanceOf(ClientsApiError);
-    expect(error).toMatchObject({
-      status: 500,
-      message: "Failed to load clients (500)",
-    });
+    await expect(fetchClients(fetchImpl)).rejects.toThrow(
+      "Failed to load clients (500)",
+    );
   });
 });

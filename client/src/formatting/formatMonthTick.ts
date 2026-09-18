@@ -1,6 +1,4 @@
-/**
- * Shortens month labels for narrow viewports ("Feb 2024" → "Feb '24").
- */
+/** "Feb 2024" → "Feb '24" for narrow viewports. */
 export function formatMonthTick(month: string): string {
   const match = /^([A-Za-z]+)\s+(\d{4})$/.exec(month);
 

@@ -91,4 +91,21 @@ describe("TreeRow", () => {
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
     expect(screen.getByText("Branch 2")).toBeInTheDocument();
   });
+
+  it("exposes hierarchy depth on the row and expand state on the control", () => {
+    renderInTable(
+      <TreeRow
+        row={employeeRow}
+        expanded
+        onToggleExpand={() => undefined}
+      />,
+    );
+
+    const row = screen.getByText("Anna Blackwood").closest("tr");
+    expect(row).toHaveAttribute("aria-level", "3");
+    expect(row).not.toHaveAttribute("aria-expanded");
+    expect(
+      screen.getByRole("button", { name: "Collapse Anna Blackwood" }),
+    ).toHaveAttribute("aria-expanded", "true");
+  });
 });

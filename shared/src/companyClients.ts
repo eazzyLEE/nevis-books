@@ -1,9 +1,8 @@
-import type { Company } from "@nevis-books/shared";
+import type { Company } from "./types.js";
 
 /**
- * Company tree served by GET /api/clients.
- * Uneven nesting is intentional: Branch 2/3 have no employees;
- * only Anna Blackwood has acquisition channels.
+ * Assignment company tree (API payload + client tests).
+ * Branch 2/3 have no employees; only Anna Blackwood has channels.
  */
 export const companyClients: Company = {
   id: "d6e00056-dce4-4ef4-b034-d6467db6187d",

@@ -59,7 +59,7 @@ describe("ClientsChart", () => {
     expect(
       screen.getByText("No acquisition channel data to chart."),
     ).toBeInTheDocument();
-    expect(screen.queryByTestId("clients-chart")).not.toBeInTheDocument();
+    expect(screen.queryByRole("figure")).not.toBeInTheDocument();
   });
 
   it("renders the chart when series data is present", () => {
@@ -67,7 +67,11 @@ describe("ClientsChart", () => {
 
     render(<ClientsChart series={series} />);
 
-    expect(screen.getByTestId("clients-chart")).toBeInTheDocument();
+    expect(
+      screen.getByRole("figure", {
+        name: /Client acquisition by channel.*Feb 2024.*Jan 2025/,
+      }),
+    ).toBeInTheDocument();
     expect(
       screen.queryByText("No acquisition channel data to chart."),
     ).not.toBeInTheDocument();

@@ -33,6 +33,11 @@ describe("ClientsTable", () => {
       />,
     );
 
+    expect(
+      screen.getByRole("table", {
+        name: "Client hierarchy with monthly acquisition values",
+      }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "Feb 2024" })).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "Jan 2025" })).toBeInTheDocument();
     expect(screen.getByText("Company")).toBeInTheDocument();

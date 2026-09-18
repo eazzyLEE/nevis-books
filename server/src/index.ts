@@ -7,7 +7,6 @@ const PORT = Number(process.env.PORT) || 3001;
 const app = express();
 
 app.use(cors());
-app.use(express.json());
 
 app.get("/api/health", (_request, response) => {
   response.json({ status: "ok" });
