@@ -41,6 +41,35 @@ export function ClientsChart({ series }: ClientsChartProps) {
         {series.points[series.points.length - 1]!.month}. Series:{" "}
         {series.seriesKeys.join(", ")}.
       </figcaption>
+
+      <div className="visuallyHidden">
+        <table>
+          <caption>Monthly acquisition values by channel</caption>
+          <thead>
+            <tr>
+              <th scope="col">Month</th>
+              {series.seriesKeys.map((seriesKey) => (
+                <th key={seriesKey} scope="col">
+                  {seriesKey}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {series.points.map((point) => (
+              <tr key={point.month}>
+                <th scope="row">{point.month}</th>
+                {series.seriesKeys.map((seriesKey) => (
+                  <td key={seriesKey}>
+                    {point.valuesBySeriesKey[seriesKey] ?? 0}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       <div className={styles.plot} aria-hidden="true">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>

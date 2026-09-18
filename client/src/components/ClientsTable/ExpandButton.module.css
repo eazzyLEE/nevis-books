@@ -37,3 +37,9 @@
 .chevron[data-expanded="true"] {
   transform: rotate(45deg);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}

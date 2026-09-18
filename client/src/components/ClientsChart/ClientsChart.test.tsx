@@ -73,6 +73,15 @@ describe("ClientsChart", () => {
       }),
     ).toBeInTheDocument();
     expect(
+      screen.getByRole("table", {
+        name: "Monthly acquisition values by channel",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: "Existing clients" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("rowheader", { name: "Feb 2024" })).toBeInTheDocument();
+    expect(
       screen.queryByText("No acquisition channel data to chart."),
     ).not.toBeInTheDocument();
   });
