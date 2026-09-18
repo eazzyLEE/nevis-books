@@ -9,6 +9,12 @@
 
 .header {
   display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.titleRow {
+  display: flex;
   align-items: center;
   gap: 0.5rem;
 }
@@ -27,6 +33,20 @@
   font-weight: 600;
   color: var(--color-accent);
   letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0;
+  padding-left: calc(0.65rem + 0.5rem);
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+}
+
+.meta {
+  margin: 0;
+  padding-left: calc(0.65rem + 0.5rem);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
 }
 
 .panel {

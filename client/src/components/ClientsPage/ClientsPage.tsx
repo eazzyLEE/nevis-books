@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { MONTH_LABELS } from "@nevis-books/shared";
 import { buildChartSeries } from "../../domain/chartSeries";
 import {
   buildVisibleRows,
@@ -8,6 +9,18 @@ import { useClients } from "../../hooks/useClients";
 import { ClientsChart } from "../ClientsChart";
 import { ClientsTable } from "../ClientsTable";
 import styles from "./ClientsPage.module.css";
+
+const PERIOD_START = MONTH_LABELS[0];
+const PERIOD_END = MONTH_LABELS[MONTH_LABELS.length - 1];
+
+const updatedAtFormatter = new Intl.DateTimeFormat(undefined, {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+  timeZoneName: "short",
+});
 
 function StatusMessage({
   children,
@@ -29,10 +42,17 @@ export function ClientsPage() {
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<string> | null>(
     null,
   );
+  const [loadedAt, setLoadedAt] = useState<Date | null>(null);
 
   useEffect(() => {
     setExpandedIds(null);
   }, [companyId]);
+
+  useEffect(() => {
+    if (clients.status === "success") {
+      setLoadedAt(new Date());
+    }
+  }, [clients.status, companyId]);
 
   const activeExpandedIds =
     expandedIds ?? (companyId ? new Set([companyId]) : new Set());
@@ -57,8 +77,18 @@ export function ClientsPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <span className={styles.diamond} aria-hidden="true" />
-        <h1 className={styles.title}>Clients</h1>
+        <div className={styles.titleRow}>
+          <span className={styles.diamond} aria-hidden="true" />
+          <h1 className={styles.title}>Clients</h1>
+        </div>
+        <p className={styles.subtitle}>
+          Book of business · {PERIOD_START}–{PERIOD_END}
+        </p>
+        {loadedAt ? (
+          <p className={styles.meta}>
+            Updated {updatedAtFormatter.format(loadedAt)}
+          </p>
+        ) : null}
       </header>
 
       <section

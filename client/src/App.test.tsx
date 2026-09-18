@@ -20,6 +20,9 @@ describe("App", () => {
     render(<App />);
 
     expect(screen.getByRole("heading", { name: "Clients" })).toBeInTheDocument();
+    expect(
+      screen.getByText("Book of business · Feb 2024–Jan 2025"),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText("Client acquisition over time")).toBeInTheDocument();
     expect(screen.getByLabelText("Client detail by month")).toBeInTheDocument();
 
@@ -31,6 +34,7 @@ describe("App", () => {
       ).toBeInTheDocument();
       expect(screen.getByText("Company")).toBeInTheDocument();
       expect(screen.getByText("Branch 1")).toBeInTheDocument();
+      expect(screen.getByText(/^Updated /)).toBeInTheDocument();
     });
   });
 });
