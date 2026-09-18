@@ -14,3 +14,21 @@ export function StatusMessage({
     </div>
   );
 }
+
+export function ClientsLoadError({
+  detail,
+  onRetry,
+}: {
+  detail: string;
+  onRetry: () => void;
+}) {
+  return (
+    <StatusMessage role="alert">
+      <p className={styles.title}>Couldn’t load clients</p>
+      <p className={styles.detail}>{detail}</p>
+      <button type="button" className={styles.retry} onClick={onRetry}>
+        Retry
+      </button>
+    </StatusMessage>
+  );
+}

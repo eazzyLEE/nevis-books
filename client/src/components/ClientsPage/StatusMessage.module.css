@@ -3,26 +3,49 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  min-height: 10rem;
+  gap: 0.5rem;
+  min-height: 12rem;
   margin: 0;
+  padding: 1.5rem 1.25rem;
   color: var(--color-text-muted);
   font-size: 0.875rem;
-  border: 1px dashed var(--color-border);
-  border-radius: calc(var(--radius-card) - 4px);
-}
-
-.placeholder button {
-  font: inherit;
-  cursor: pointer;
-  color: var(--color-text);
-  background: var(--color-beige);
+  text-align: center;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-card);
 }
 
-.placeholder button:focus-visible {
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.detail {
+  margin: 0;
+  max-width: 28rem;
+  line-height: 1.45;
+}
+
+.retry {
+  margin-top: 0.5rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-white);
+  background: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+}
+
+.retry:hover {
+  background: var(--color-accent-strong);
+  border-color: var(--color-accent-strong);
+}
+
+.retry:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }

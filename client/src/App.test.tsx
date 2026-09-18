@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { sampleCompany } from "./domain/fixtures/sampleCompany";
 import { App } from "./App";
@@ -6,6 +7,40 @@ import { App } from "./App";
 describe("App", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it("shows a single page-level error with retry when the API fails", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => sampleCompany,
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<App />);
+
+    expect(
+      await screen.findByRole("alert"),
+    ).toHaveTextContent("Couldn’t load clients");
+    expect(screen.getByText(/Failed to load clients \(500\)/)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Acquisition over time" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getAllByRole("alert")).toHaveLength(1);
+
+    await user.click(screen.getByRole("button", { name: "Retry" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Company")).toBeInTheDocument();
+    });
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("renders the Clients page with chart and table after load", async () => {

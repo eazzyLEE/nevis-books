@@ -11,7 +11,7 @@ import { ClientsTable } from "../ClientsTable";
 import styles from "./ClientsPage.module.css";
 import { ClientsPageHeader } from "./ClientsPageHeader";
 import { ChartSkeleton, TableSkeleton } from "./PanelSkeletons";
-import { StatusMessage } from "./StatusMessage";
+import { ClientsLoadError } from "./StatusMessage";
 import { SummaryStrip } from "./SummaryStrip";
 
 export function ClientsPage() {
@@ -43,77 +43,77 @@ export function ClientsPage() {
       : [];
 
   const isLoading = clients.status === "loading";
-
-  const errorBlock =
-    clients.status === "error" ? (
-      <StatusMessage role="alert">
-        <p>{clients.error.message}</p>
-        <button type="button" onClick={clients.retry}>
-          Retry
-        </button>
-      </StatusMessage>
-    ) : null;
+  const isError = clients.status === "error";
 
   return (
     <main className={styles.page}>
       <ClientsPageHeader loadedAt={loadedAt} />
 
-      {clients.status === "success" ? (
+      {isError ? (
+        <ClientsLoadError
+          detail={clients.error.message}
+          onRetry={clients.retry}
+        />
+      ) : null}
+
+      {!isError && clients.status === "success" ? (
         <SummaryStrip summary={buildClientSummary(clients.data)} />
       ) : null}
 
-      <section
-        className={styles.panel}
-        aria-labelledby={chartHeadingId}
-        aria-busy={isLoading}
-      >
-        <div className={styles.panelHeader}>
-          <h2 id={chartHeadingId} className={styles.panelTitle}>
-            Acquisition over time
-          </h2>
-          <p className={styles.panelDescription}>
-            Stacked clients by acquisition channel
-          </p>
-        </div>
-        {isLoading ? <ChartSkeleton /> : null}
-        {errorBlock}
-        {clients.status === "success" ? (
-          <ClientsChart series={buildChartSeries(clients.data)} />
-        ) : null}
-      </section>
+      {!isError ? (
+        <section
+          className={styles.panel}
+          aria-labelledby={chartHeadingId}
+          aria-busy={isLoading}
+        >
+          <div className={styles.panelHeader}>
+            <h2 id={chartHeadingId} className={styles.panelTitle}>
+              Acquisition over time
+            </h2>
+            <p className={styles.panelDescription}>
+              Stacked clients by acquisition channel
+            </p>
+          </div>
+          {isLoading ? <ChartSkeleton /> : null}
+          {clients.status === "success" ? (
+            <ClientsChart series={buildChartSeries(clients.data)} />
+          ) : null}
+        </section>
+      ) : null}
 
-      <section
-        className={`${styles.panel} ${styles.tablePanel}`}
-        aria-labelledby={tableHeadingId}
-        aria-busy={isLoading}
-      >
-        <div className={styles.panelHeader}>
-          <h2 id={tableHeadingId} className={styles.panelTitle}>
-            Detail by month
-          </h2>
-          <p className={styles.panelDescription}>
-            Expand the hierarchy to inspect branches, employees, and channels
-          </p>
-        </div>
-        {isLoading ? <TableSkeleton /> : null}
-        {errorBlock}
-        {clients.status === "success" ? (
-          <ClientsTable
-            rows={visibleRows}
-            expandedIds={activeExpandedIds}
-            onToggleExpand={(rowId) => {
-              const company = clients.data;
-              setExpandedIds((current) =>
-                toggleExpandedIds(
-                  company,
-                  current ?? new Set([company.id]),
-                  rowId,
-                ),
-              );
-            }}
-          />
-        ) : null}
-      </section>
+      {!isError ? (
+        <section
+          className={`${styles.panel} ${styles.tablePanel}`}
+          aria-labelledby={tableHeadingId}
+          aria-busy={isLoading}
+        >
+          <div className={styles.panelHeader}>
+            <h2 id={tableHeadingId} className={styles.panelTitle}>
+              Detail by month
+            </h2>
+            <p className={styles.panelDescription}>
+              Expand the hierarchy to inspect branches, employees, and channels
+            </p>
+          </div>
+          {isLoading ? <TableSkeleton /> : null}
+          {clients.status === "success" ? (
+            <ClientsTable
+              rows={visibleRows}
+              expandedIds={activeExpandedIds}
+              onToggleExpand={(rowId) => {
+                const company = clients.data;
+                setExpandedIds((current) =>
+                  toggleExpandedIds(
+                    company,
+                    current ?? new Set([company.id]),
+                    rowId,
+                  ),
+                );
+              }}
+            />
+          ) : null}
+        </section>
+      ) : null}
     </main>
   );
 }
