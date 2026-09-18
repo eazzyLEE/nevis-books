@@ -1,0 +1,40 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.mark {
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  border-radius: 0.35rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0;
+  padding-left: calc(1.75rem + 0.6rem);
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+}
+
+.meta {
+  margin: 0;
+  padding-left: calc(1.75rem + 0.6rem);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}

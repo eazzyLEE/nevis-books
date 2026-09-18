@@ -1,5 +1,4 @@
-import { useEffect, useId, useState, type ReactNode } from "react";
-import { MONTH_LABELS } from "@nevis-books/shared";
+import { useEffect, useId, useState } from "react";
 import { buildChartSeries } from "../../domain/chartSeries";
 import { buildClientSummary } from "../../domain/clientSummary";
 import {
@@ -10,33 +9,10 @@ import { useClients } from "../../hooks/useClients";
 import { ClientsChart } from "../ClientsChart";
 import { ClientsTable } from "../ClientsTable";
 import styles from "./ClientsPage.module.css";
+import { ClientsPageHeader } from "./ClientsPageHeader";
+import { ChartSkeleton, TableSkeleton } from "./PanelSkeletons";
+import { StatusMessage } from "./StatusMessage";
 import { SummaryStrip } from "./SummaryStrip";
-
-const PERIOD_START = MONTH_LABELS[0];
-const PERIOD_END = MONTH_LABELS[MONTH_LABELS.length - 1];
-
-const updatedAtFormatter = new Intl.DateTimeFormat(undefined, {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZoneName: "short",
-});
-
-function StatusMessage({
-  children,
-  role = "status",
-}: {
-  children: ReactNode;
-  role?: "status" | "alert";
-}) {
-  return (
-    <div className={styles.placeholder} role={role}>
-      {children}
-    </div>
-  );
-}
 
 export function ClientsPage() {
   const chartHeadingId = useId();
@@ -80,27 +56,7 @@ export function ClientsPage() {
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
-        <div className={styles.titleRow}>
-          <img
-            className={styles.mark}
-            src="/favicon.svg"
-            alt=""
-            width={28}
-            height={28}
-            decoding="async"
-          />
-          <h1 className={styles.title}>Clients</h1>
-        </div>
-        <p className={styles.subtitle}>
-          Book of business · {PERIOD_START}–{PERIOD_END}
-        </p>
-        {loadedAt ? (
-          <p className={styles.meta}>
-            Updated {updatedAtFormatter.format(loadedAt)}
-          </p>
-        ) : null}
-      </header>
+      <ClientsPageHeader loadedAt={loadedAt} />
 
       {clients.status === "success" ? (
         <SummaryStrip summary={buildClientSummary(clients.data)} />
@@ -119,9 +75,7 @@ export function ClientsPage() {
             Stacked clients by acquisition channel
           </p>
         </div>
-        {isLoading ? (
-          <StatusMessage>Loading chart…</StatusMessage>
-        ) : null}
+        {isLoading ? <ChartSkeleton /> : null}
         {errorBlock}
         {clients.status === "success" ? (
           <ClientsChart series={buildChartSeries(clients.data)} />
@@ -141,9 +95,7 @@ export function ClientsPage() {
             Expand the hierarchy to inspect branches, employees, and channels
           </p>
         </div>
-        {isLoading ? (
-          <StatusMessage>Loading table…</StatusMessage>
-        ) : null}
+        {isLoading ? <TableSkeleton /> : null}
         {errorBlock}
         {clients.status === "success" ? (
           <ClientsTable
