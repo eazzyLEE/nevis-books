@@ -9,6 +9,18 @@
   --row-surface: var(--color-surface-zebra);
 }
 
+.row:hover {
+  --row-surface: color-mix(
+    in srgb,
+    var(--color-accent-soft) 65%,
+    var(--color-surface)
+  );
+}
+
+.row:hover .valueCell {
+  font-weight: 600;
+}
+
 .nameCell {
   position: sticky;
   left: 0;
@@ -65,4 +77,5 @@
   font-variant-numeric: tabular-nums;
   color: var(--color-text);
   white-space: nowrap;
+  background-color: var(--row-surface);
 }
