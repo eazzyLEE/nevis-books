@@ -60,6 +60,41 @@ describe("ClientsTable", () => {
     expect(onToggleExpand).toHaveBeenCalledWith("company-1");
   });
 
+  it("highlights a month column on header hover and clears on leave", async () => {
+    const user = userEvent.setup();
+    const onHighlightMonth = vi.fn();
+
+    const { rerender } = render(
+      <ClientsTable
+        rows={rows}
+        expandedIds={new Set(["company-1"])}
+        onToggleExpand={() => undefined}
+        highlightedMonth={null}
+        onHighlightMonth={onHighlightMonth}
+      />,
+    );
+
+    await user.hover(screen.getByRole("columnheader", { name: "Aug 2024" }));
+    expect(onHighlightMonth).toHaveBeenCalledWith("Aug 2024");
+
+    rerender(
+      <ClientsTable
+        rows={rows}
+        expandedIds={new Set(["company-1"])}
+        onToggleExpand={() => undefined}
+        highlightedMonth="Aug 2024"
+        onHighlightMonth={onHighlightMonth}
+      />,
+    );
+
+    expect(
+      screen.getByRole("columnheader", { name: "Aug 2024" }),
+    ).toHaveAttribute("data-month-active", "true");
+
+    await user.unhover(screen.getByRole("table"));
+    expect(onHighlightMonth).toHaveBeenCalledWith(null);
+  });
+
   it("shows an empty state when there are no rows", () => {
     render(
       <ClientsTable

@@ -1,4 +1,6 @@
 import type { CSSProperties } from "react";
+import { MONTH_LABELS, type MonthLabel } from "@nevis-books/shared";
+import type { MonthHighlightHandler } from "../../formatting/monthHighlight";
 import type { TableRow } from "../../domain/tableRows";
 import { ExpandButton } from "./ExpandButton";
 import { initialsFromName } from "./initialsFromName";
@@ -8,9 +10,17 @@ export interface TreeRowProps {
   row: TableRow;
   expanded: boolean;
   onToggleExpand?: () => void;
+  highlightedMonth?: MonthLabel | null;
+  onHighlightMonth?: MonthHighlightHandler;
 }
 
-export function TreeRow({ row, expanded, onToggleExpand }: TreeRowProps) {
+export function TreeRow({
+  row,
+  expanded,
+  onToggleExpand,
+  highlightedMonth = null,
+  onHighlightMonth,
+}: TreeRowProps) {
   const showAvatar = row.kind === "employee";
   const rowStyle = {
     "--row-depth": row.depth,
@@ -40,11 +50,23 @@ export function TreeRow({ row, expanded, onToggleExpand }: TreeRowProps) {
         </div>
       </th>
 
-      {row.values.map((value, monthIndex) => (
-        <td key={`${row.id}-${monthIndex}`} className={styles.valueCell}>
-          {value}
-        </td>
-      ))}
+      {row.values.map((value, monthIndex) => {
+        const month = MONTH_LABELS[monthIndex]!;
+        const isActive = highlightedMonth === month;
+
+        return (
+          <td
+            key={`${row.id}-${month}`}
+            className={styles.valueCell}
+            data-month-active={isActive ? "true" : undefined}
+            onMouseEnter={() => {
+              onHighlightMonth?.(month);
+            }}
+          >
+            {value}
+          </td>
+        );
+      })}
     </tr>
   );
 }

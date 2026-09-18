@@ -14,7 +14,7 @@
 
   /* Zebra must be opaque so sticky columns don't show through */
   --color-surface: var(--color-white);
-  --color-surface-zebra: #f3f2ed;
+  --color-surface-zebra: #f8f7f3;
   --color-page: var(--color-beige);
 
   --color-accent: #8326c9;

@@ -1,137 +1,108 @@
 # Nevis Books
 
-Clients book-of-business dashboard: stacked acquisition chart and an expandable hierarchy table for company → branch → employee → channel, over Feb 2024–Jan 2025.
+A Clients book-of-business dashboard: stacked acquisition over time, plus a monthly detail table you can expand from company → branch → advisor → channel (Feb 2024–Jan 2025).
 
-## Stack
+## Run
 
-npm workspaces monorepo:
-
-| Package | Role |
-| --- | --- |
-| `client` | React 19 + TypeScript + Vite + Recharts |
-| `server` | Express `GET /api/clients` (+ health) |
-| `shared` | Shared `Company` types, month labels, and the sample payload |
-
-No CSS framework — design tokens (`client/src/styles/tokens.css`) and CSS modules. Vite proxies `/api` → `http://localhost:3001`.
-
-## Requirements
-
-- Node.js 20+
-- npm 9+ (workspaces)
-
-## Run locally
+Needs Node 20+ and npm 9+ (workspaces).
 
 ```bash
 npm install
 npm run dev
 ```
 
-- App: [http://localhost:5173](http://localhost:5173)
-- API: [http://localhost:3001/api/clients](http://localhost:3001/api/clients)
-
-Useful scripts:
+- App: http://localhost:5173  
+- API: http://localhost:3001/api/clients  
 
 ```bash
 npm test          # client Vitest suite
 npm run build     # shared → server → client
 ```
 
-Local development is via `npm run dev` (tsx). A production `npm start` path for the built API is not the supported demo flow yet.
+`npm run dev` is the supported path. The API uses `tsx` in development; don’t rely on `npm start` for the demo.
 
-### Simulated API latency
+By default `GET /api/clients` waits ~500ms so loading UI is visible. Override with `CLIENTS_DELAY_MS` (e.g. `0` or `1000`) on the server.
 
-`GET /api/clients` waits ~500ms by default so loading UI is visible in demos.
+## What’s in the repo
 
-```bash
-CLIENTS_DELAY_MS=0 npm run dev:server   # disable
-CLIENTS_DELAY_MS=1000 npm run dev:server
-```
+npm workspaces:
 
-## Architecture
-
-The client is layered so UI stays presentational and tree logic stays testable without React:
-
-| Layer | Responsibility |
+| Package | What it does |
 | --- | --- |
-| `components/` | Page shell, summary, chart, and expandable table (CSS modules) |
-| `hooks/` | `useClients` — loading / success / error + retry |
-| `domain/` | Pure mappers: company → chart series / summary / visible rows |
-| `api/` | `fetchClients` against `/api/clients` |
-| `shared` | `Company` types, month labels, sample payload (used by API + tests) |
+| `client` | React 19 + TypeScript + Vite + Recharts |
+| `server` | Express `GET /api/clients` (and a health check) |
+| `shared` | `Company` types, month labels, and the sample payload from the brief |
+
+No CSS framework — tokens in `client/src/styles/tokens.css`, then CSS modules. Vite proxies `/api` to the Express server.
+
+### How the client is split
+
+I kept UI presentational and put tree/chart math in plain functions so it’s easy to test without mounting React:
+
+- `domain/` — company → chart series, summary metrics, visible table rows  
+- `hooks/useClients` — fetch lifecycle (loading / success / error + retry)  
+- `hooks/useClientsDashboard` — page wiring (expansion, month highlight, derived props)  
+- `components/` — page shell, chart, table  
+- `api/` — `fetchClients`  
+- `formatting/` — month tick labels and highlight opacity helpers  
 
 ```text
-┌──────────────────────────────────────────────────┐
-│  ClientsPage                                     │
-│   ├─ SummaryStrip  ← buildClientSummary          │
-│   ├─ ClientsChart  ← buildChartSeries            │
-│   └─ ClientsTable  ← buildVisibleRows            │
-│         ↑ expand/collapse (Set of ids)           │
-└──────────────────────┬───────────────────────────┘
-                       │ useClients
-                       ▼
-                fetchClients  ──proxy──►  Express GET /api/clients
+ClientsPage (compose)
+  └─ useClientsDashboard
+        ├─ SummaryStrip  ← buildClientSummary
+        ├─ ClientsChart  ← buildChartSeries
+        └─ ClientsTable  ← buildVisibleRows
+              ↑ expand/collapse + month highlight
+                    │
+              useClients → fetchClients → GET /api/clients
 ```
 
-**UI behavior**
-
-- Expansion is a `Set` of open node ids in page state (no global store).
-- Collapsing a node clears its descendants, so re-expanding shows children collapsed.
-- Default view: Company expanded; branches / employees / channels closed.
-- Loading uses layout-shaped skeletons (chart bars + table grid) under the API delay.
-- Errors surface once at page level (“Couldn’t load clients”) with Retry; chart/table panels stay hidden until data loads.
+`ClientsPage` mostly composes. Expansion is a `Set` of open ids (no global store). Default: Company open, everything under it closed — same as the first design frame. Collapsing a parent also clears its descendants so a re-expand doesn’t resurrect nested open state.
 
 ## Assumptions
 
-- **Chart vs table:** The chart stacks acquisition **channels** aggregated by channel name across the tree. Today only Anna Blackwood has channels, so chart totals are smaller than company/branch table totals (which come from each node’s own `values`).
-- **Series colors:** Fills follow first-seen series index in a CSS palette, not hard-coded channel names.
-- **Avatars:** Initials from employee names (no image URLs in the payload).
-- **Tokens:** Page neutrals from Nevis marketing (`#F7F6F0` / `#141413`); product accent and chart stacks follow the assignment UI (purple diamond / lavender–rose stacks).
+These are the calls the brief left open, and why I landed where I did.
+
+**Chart vs table numbers.** The chart stacks **acquisition channels**, summed by channel name across the tree. The table shows each node’s own `values`. In the sample data only Anna Blackwood has channels, so chart totals are smaller than company/branch totals. I think that’s the right read of “acquisition over time,” but it’s also the biggest place the brief’s data and the design totals can disagree — see Open questions.
+
+**Uneven tree.** Branch 2 and Branch 3 have no employees; only Anna has channels. Rows without children simply omit the expand control.
+
+**Avatars.** The design shows photos; the payload only has names. I used initials rather than inventing image URLs.
+
+**Series colors.** Palette by first-seen series index (CSS tokens), not hard-coded channel names, so a new channel still gets a color.
+
+**Look and feel.** Light theme only. Neutrals lean on Nevis marketing beige/near-black; purple accent and chart stacks follow the assignment UI. Table zebra is intentionally soft. Not aiming for pixel-perfect Figma parity.
+
+**Narrow viewports.** Full responsive redesign wasn’t required. Down around 375px the table keeps a sticky name column and scrolls horizontally for the months instead of crushing the layout.
+
+**Month highlight.** Hovering/focusing a month in the table (or hovering it on the chart) ties the two views together with a light column highlight and a soft dim on other bars. Tooltip stays chart-hover only so the table doesn’t drag a floating tooltip around.
 
 ## Accessibility
 
-- Expand controls are native buttons with `aria-expanded` and keyboard support (Enter / Space).
-- Hierarchical rows expose `aria-level`; the chart plot is decorative with a figcaption plus a visually hidden month × series data table.
-- Expand chevron and loading skeletons honor `prefers-reduced-motion`.
-- Full `treegrid` arrow-key navigation was out of scope; expand/collapse via the control is the primary keyboard path.
+Expand/collapse uses native buttons with `aria-expanded` (keyboard: Enter / Space). Rows expose `aria-level` for the hierarchy. The Recharts plot is treated as decorative; there’s a figcaption plus a visually hidden month × series data table for screen readers. Month headers are focusable so the highlight sync works from the keyboard too. Chevron animation and skeleton pulse respect `prefers-reduced-motion`.
+
+I didn’t implement a full `treegrid` arrow-key model — the expand control is the primary keyboard path. That felt like the right cut for the timebox; it’s listed under next steps if hierarchy navigation becomes a hard requirement.
 
 ## Tests
-
-Client tests cover:
-
-- Domain chart aggregation, summary metrics, and visible-row flattening (including collapse-clears-descendants)
-- `useClients` loading / error / retry
-- Expand control, table, and chart (including accessible data table)
 
 ```bash
 npm test
 ```
 
-Standards today are enforced by TypeScript strictness (`strict`, unused checks, `noUncheckedIndexedAccess`) and the Vitest suite — there is no ESLint/Prettier config yet (see Improvements).
+Coverage includes chart aggregation, summary metrics, visible-row flattening (including collapse-clears-descendants), `useClients` states, expand control / table / chart UI (including the accessible data table), page-level error + retry, and month-highlight helpers.
+
+TypeScript is strict (`strict`, unused checks, `noUncheckedIndexedAccess`, etc.). There’s no ESLint/Prettier config yet — I’d add that (or Biome) with CI if this lived past the exercise.
 
 ## Open questions
 
-- Should the chart instead stack company-level totals (or a mix), so chart and table speak the same “book” numbers?
-- Should collapse always clear descendants (current behavior), or preserve nested expand state for power users?
+- Should the chart use company-level totals (or a blend) so it lines up with the table “book” numbers? Right now channel-only stacking matches acquisition language but not the big company figures in the design.
+- On collapse, clear nested expand state (current) or remember it for power users?
+- Anything else in the sample tree that should drive the chart (e.g. employees without channels)?
 
-## Improvements
+## What I’d do next
 
-Honest next steps if this grew beyond a focused dashboard slice — split into product feel vs engineering hygiene.
+Product-wise: expand/collapse all, thousands separators, optional name filter, photo avatars once the API has URLs.
 
-### Product (make it feel like a real Clients book)
+Engineering-wise: lint/format in CI, one page-level expand/collapse UI test, React Query once there’s more than one resource, and lazy-loading Recharts again when the Vitest path is solid (it’s eager today because lazy + Suspense was flaky under test).
 
-- **Table affordances** — Expand all / Collapse all; a short empty hint when everything is collapsed.
-- **Chart ↔ table sync** — hover or focus a month in the table to emphasize that month on the chart (and vice versa).
-- **Density & formatting** — thousands separators; optional compact table density for long trees.
-- **Search / filter** — filter the hierarchy by branch or employee name (local state only).
-- **Richer identity** — photo avatars when the API provides URLs; soft app shell with product name + Clients as the current section.
-
-### Engineering
-
-- **Lint / format** — ESLint + Prettier (or Biome) with a CI check before merge.
-- **Page-level expand test** — one UI test that expands Company → Branch and asserts collapse clears descendants end-to-end.
-- **Data layer** — React Query (or similar) for cache, stale-while-revalidate, and clearer retry semantics once there is more than one resource.
-- **Chart code-splitting** — lazy-load Recharts again once the Vitest/lazy path is stable (eager import today to keep tests reliable).
-
-## Out of scope for this version
-
-Pixel-perfect Figma parity, auth, multi-company switching, date-range / CSV export, mutations, notifications, Redux, and a full responsive redesign beyond usable narrow viewports (sticky name column + horizontal scroll).
+Deliberately not in this version: auth, multi-company switching, date range / CSV export, mutations, Redux, or chasing every Figma detail.

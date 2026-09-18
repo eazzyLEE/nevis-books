@@ -1,0 +1,28 @@
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem 1.15rem;
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 0 0;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legendSwatch {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 0.2rem;
+  flex-shrink: 0;
+}
+
+.legendLabel {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 0.75rem;
+}

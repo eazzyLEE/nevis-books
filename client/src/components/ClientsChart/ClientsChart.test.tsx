@@ -85,4 +85,16 @@ describe("ClientsChart", () => {
       screen.queryByText("No acquisition channel data to chart."),
     ).not.toBeInTheDocument();
   });
+
+  it("dims non-highlighted months when a month is selected", () => {
+    const series = buildChartSeries(sampleCompany);
+
+    render(<ClientsChart series={series} highlightedMonth="Feb 2024" />);
+
+    expect(
+      screen.getByRole("figure", {
+        name: /Client acquisition by channel/,
+      }),
+    ).toHaveAttribute("data-highlighted-month", "Feb 2024");
+  });
 });

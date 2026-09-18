@@ -1,118 +1,72 @@
-import { useEffect, useId, useState } from "react";
-import { buildChartSeries } from "../../domain/chartSeries";
-import { buildClientSummary } from "../../domain/clientSummary";
-import {
-  buildVisibleRows,
-  toggleExpandedIds,
-} from "../../domain/tableRows";
-import { useClients } from "../../hooks/useClients";
+import { useId } from "react";
+import { useClientsDashboard } from "../../hooks/useClientsDashboard";
 import { ClientsChart } from "../ClientsChart";
 import { ClientsTable } from "../ClientsTable";
-import styles from "./ClientsPage.module.css";
 import { ClientsPageHeader } from "./ClientsPageHeader";
+import { DashboardPanel } from "./DashboardPanel";
 import { ChartSkeleton, TableSkeleton } from "./PanelSkeletons";
 import { ClientsLoadError } from "./StatusMessage";
 import { SummaryStrip } from "./SummaryStrip";
+import styles from "./ClientsPage.module.css";
 
 export function ClientsPage() {
   const chartHeadingId = useId();
   const tableHeadingId = useId();
-  const clients = useClients();
-  const companyId = clients.status === "success" ? clients.data.id : null;
-  const [expandedIds, setExpandedIds] = useState<ReadonlySet<string> | null>(
-    null,
-  );
-  const [loadedAt, setLoadedAt] = useState<Date | null>(null);
-
-  useEffect(() => {
-    setExpandedIds(null);
-  }, [companyId]);
-
-  useEffect(() => {
-    if (clients.status === "success") {
-      setLoadedAt(new Date());
-    }
-  }, [clients.status, companyId]);
-
-  const activeExpandedIds =
-    expandedIds ?? (companyId ? new Set([companyId]) : new Set());
-
-  const visibleRows =
-    clients.status === "success"
-      ? buildVisibleRows(clients.data, activeExpandedIds)
-      : [];
-
-  const isLoading = clients.status === "loading";
-  const isError = clients.status === "error";
+  const dashboard = useClientsDashboard();
+  const isLoading = dashboard.status === "loading";
 
   return (
     <main className={styles.page}>
-      <ClientsPageHeader loadedAt={loadedAt} />
+      <ClientsPageHeader loadedAt={dashboard.loadedAt} />
 
-      {isError ? (
+      {dashboard.status === "error" ? (
         <ClientsLoadError
-          detail={clients.error.message}
-          onRetry={clients.retry}
+          detail={dashboard.errorMessage}
+          onRetry={dashboard.retry}
         />
       ) : null}
 
-      {!isError && clients.status === "success" ? (
-        <SummaryStrip summary={buildClientSummary(clients.data)} />
+      {dashboard.status === "success" ? (
+        <SummaryStrip summary={dashboard.summary} />
       ) : null}
 
-      {!isError ? (
-        <section
-          className={styles.panel}
-          aria-labelledby={chartHeadingId}
-          aria-busy={isLoading}
+      {dashboard.status !== "error" ? (
+        <DashboardPanel
+          titleId={chartHeadingId}
+          title="Acquisition over time"
+          description="Stacked clients by acquisition channel"
+          busy={isLoading}
         >
-          <div className={styles.panelHeader}>
-            <h2 id={chartHeadingId} className={styles.panelTitle}>
-              Acquisition over time
-            </h2>
-            <p className={styles.panelDescription}>
-              Stacked clients by acquisition channel
-            </p>
-          </div>
           {isLoading ? <ChartSkeleton /> : null}
-          {clients.status === "success" ? (
-            <ClientsChart series={buildChartSeries(clients.data)} />
-          ) : null}
-        </section>
-      ) : null}
-
-      {!isError ? (
-        <section
-          className={`${styles.panel} ${styles.tablePanel}`}
-          aria-labelledby={tableHeadingId}
-          aria-busy={isLoading}
-        >
-          <div className={styles.panelHeader}>
-            <h2 id={tableHeadingId} className={styles.panelTitle}>
-              Detail by month
-            </h2>
-            <p className={styles.panelDescription}>
-              Expand the hierarchy to inspect branches, employees, and channels
-            </p>
-          </div>
-          {isLoading ? <TableSkeleton /> : null}
-          {clients.status === "success" ? (
-            <ClientsTable
-              rows={visibleRows}
-              expandedIds={activeExpandedIds}
-              onToggleExpand={(rowId) => {
-                const company = clients.data;
-                setExpandedIds((current) =>
-                  toggleExpandedIds(
-                    company,
-                    current ?? new Set([company.id]),
-                    rowId,
-                  ),
-                );
-              }}
+          {dashboard.status === "success" ? (
+            <ClientsChart
+              series={dashboard.chartSeries}
+              highlightedMonth={dashboard.highlightedMonth}
+              onHighlightMonth={dashboard.onHighlightMonth}
             />
           ) : null}
-        </section>
+        </DashboardPanel>
+      ) : null}
+
+      {dashboard.status !== "error" ? (
+        <DashboardPanel
+          titleId={tableHeadingId}
+          title="Detail by month"
+          description="Expand the hierarchy to inspect branches, employees, and channels"
+          busy={isLoading}
+          table
+        >
+          {isLoading ? <TableSkeleton /> : null}
+          {dashboard.status === "success" ? (
+            <ClientsTable
+              rows={dashboard.tableRows}
+              expandedIds={dashboard.expandedIds}
+              highlightedMonth={dashboard.highlightedMonth}
+              onHighlightMonth={dashboard.onHighlightMonth}
+              onToggleExpand={dashboard.onToggleExpand}
+            />
+          ) : null}
+        </DashboardPanel>
       ) : null}
     </main>
   );

@@ -2,6 +2,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Legend,
   ResponsiveContainer,
   Tooltip,
@@ -9,17 +10,31 @@ import {
   YAxis,
 } from "recharts";
 import { useId } from "react";
+import type { MonthLabel } from "@nevis-books/shared";
 import type { ChartSeries } from "../../domain/chartSeries";
+import {
+  barFillOpacity,
+  monthFromLabel,
+  type MonthHighlightHandler,
+} from "../../formatting/monthHighlight";
+import { formatMonthTick } from "../../formatting/formatMonthTick";
+import { ChartDataTable } from "./ChartDataTable";
+import { ChartLegend } from "./ChartLegend";
 import { fillForSeriesIndex, toRechartsRows } from "./chartPresentation";
 import { resolveChartTheme } from "./chartTheme";
-import { formatMonthTick } from "../../formatting/formatMonthTick";
 import styles from "./ClientsChart.module.css";
 
 export interface ClientsChartProps {
   series: ChartSeries;
+  highlightedMonth?: MonthLabel | null;
+  onHighlightMonth?: MonthHighlightHandler;
 }
 
-export function ClientsChart({ series }: ClientsChartProps) {
+export function ClientsChart({
+  series,
+  highlightedMonth = null,
+  onHighlightMonth,
+}: ClientsChartProps) {
   const captionId = useId();
 
   if (series.seriesKeys.length === 0 || series.points.length === 0) {
@@ -34,7 +49,11 @@ export function ClientsChart({ series }: ClientsChartProps) {
   const rows = toRechartsRows(series);
 
   return (
-    <figure className={styles.chart} aria-labelledby={captionId}>
+    <figure
+      className={styles.chart}
+      aria-labelledby={captionId}
+      data-highlighted-month={highlightedMonth ?? undefined}
+    >
       <figcaption id={captionId} className="visuallyHidden">
         Client acquisition by channel, stacked bar chart from{" "}
         {series.points[0]!.month} to{" "}
@@ -42,33 +61,7 @@ export function ClientsChart({ series }: ClientsChartProps) {
         {series.seriesKeys.join(", ")}.
       </figcaption>
 
-      <div className="visuallyHidden">
-        <table>
-          <caption>Monthly acquisition values by channel</caption>
-          <thead>
-            <tr>
-              <th scope="col">Month</th>
-              {series.seriesKeys.map((seriesKey) => (
-                <th key={seriesKey} scope="col">
-                  {seriesKey}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {series.points.map((point) => (
-              <tr key={point.month}>
-                <th scope="row">{point.month}</th>
-                {series.seriesKeys.map((seriesKey) => (
-                  <td key={seriesKey}>
-                    {point.valuesBySeriesKey[seriesKey] ?? 0}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ChartDataTable series={series} />
 
       <div className={styles.plot} aria-hidden="true">
         <ResponsiveContainer width="100%" height="100%">
@@ -77,6 +70,15 @@ export function ClientsChart({ series }: ClientsChartProps) {
             margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
             tabIndex={-1}
             style={{ outline: "none" }}
+            onMouseMove={(state) => {
+              const month = monthFromLabel(state?.activeLabel);
+              if (month) {
+                onHighlightMonth?.(month);
+              }
+            }}
+            onMouseLeave={() => {
+              onHighlightMonth?.(null);
+            }}
           >
             <CartesianGrid
               vertical={false}
@@ -108,29 +110,9 @@ export function ClientsChart({ series }: ClientsChartProps) {
             />
             <Legend
               verticalAlign="bottom"
-              content={({ payload }) => {
-                if (!payload?.length) {
-                  return null;
-                }
-
-                return (
-                  <ul className={styles.legend}>
-                    {payload.map((entry) => (
-                      <li
-                        key={String(entry.value)}
-                        className={styles.legendItem}
-                      >
-                        <span
-                          className={styles.legendSwatch}
-                          style={{ backgroundColor: entry.color }}
-                          aria-hidden="true"
-                        />
-                        <span className={styles.legendLabel}>{entry.value}</span>
-                      </li>
-                    ))}
-                  </ul>
-                );
-              }}
+              content={({ payload }) =>
+                payload ? <ChartLegend payload={payload} /> : null
+              }
             />
             {series.seriesKeys.map((seriesKey, seriesIndex) => (
               <Bar
@@ -139,7 +121,14 @@ export function ClientsChart({ series }: ClientsChartProps) {
                 stackId="acquisition"
                 fill={fillForSeriesIndex(seriesIndex, theme)}
                 maxBarSize={48}
-              />
+              >
+                {rows.map((row) => (
+                  <Cell
+                    key={`${seriesKey}-${row.month}`}
+                    fillOpacity={barFillOpacity(row.month, highlightedMonth)}
+                  />
+                ))}
+              </Bar>
             ))}
           </BarChart>
         </ResponsiveContainer>
