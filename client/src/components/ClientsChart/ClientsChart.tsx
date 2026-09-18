@@ -72,7 +72,12 @@ export function ClientsChart({ series }: ClientsChartProps) {
 
       <div className={styles.plot} aria-hidden="true">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+          <BarChart
+            data={rows}
+            margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+            tabIndex={-1}
+            style={{ outline: "none" }}
+          >
             <CartesianGrid
               vertical={false}
               stroke={theme.grid}

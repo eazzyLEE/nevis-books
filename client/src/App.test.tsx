@@ -45,6 +45,12 @@ describe("App", () => {
       expect(screen.getByText("Company")).toBeInTheDocument();
       expect(screen.getByText("Branch 1")).toBeInTheDocument();
       expect(screen.getByText(/^Updated /)).toBeInTheDocument();
+      expect(
+        screen.getByRole("list", { name: "Book of business summary" }),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Clients · Jan 2025")).toBeInTheDocument();
+      expect(screen.getByText("+100")).toBeInTheDocument();
+      expect(screen.getByText(/3 branches · 5 advisors/)).toBeInTheDocument();
     });
   });
 });

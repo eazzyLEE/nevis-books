@@ -1,6 +1,7 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { MONTH_LABELS } from "@nevis-books/shared";
 import { buildChartSeries } from "../../domain/chartSeries";
+import { buildClientSummary } from "../../domain/clientSummary";
 import {
   buildVisibleRows,
   toggleExpandedIds,
@@ -9,6 +10,7 @@ import { useClients } from "../../hooks/useClients";
 import { ClientsChart } from "../ClientsChart";
 import { ClientsTable } from "../ClientsTable";
 import styles from "./ClientsPage.module.css";
+import { SummaryStrip } from "./SummaryStrip";
 
 const PERIOD_START = MONTH_LABELS[0];
 const PERIOD_END = MONTH_LABELS[MONTH_LABELS.length - 1];
@@ -99,6 +101,10 @@ export function ClientsPage() {
           </p>
         ) : null}
       </header>
+
+      {clients.status === "success" ? (
+        <SummaryStrip summary={buildClientSummary(clients.data)} />
+      ) : null}
 
       <section
         className={styles.panel}

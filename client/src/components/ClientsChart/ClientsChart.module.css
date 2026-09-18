@@ -10,6 +10,12 @@
   height: 100%;
 }
 
+/* Decorative plot: keep click/hover tooltips, skip browser focus chrome. */
+.plot :focus,
+.plot :focus-visible {
+  outline: none;
+}
+
 .legendLabel {
   font-weight: 600;
   color: var(--color-text);
