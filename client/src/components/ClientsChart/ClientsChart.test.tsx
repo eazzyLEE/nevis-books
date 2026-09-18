@@ -46,7 +46,7 @@ describe("resolveChartTheme", () => {
     const theme = resolveChartTheme();
 
     expect(theme.seriesPalette.length).toBeGreaterThanOrEqual(3);
-    expect(theme.seriesPalette[0]).toBe("#c9b8e8");
+    expect(theme.seriesPalette[0]).toBe("#9b82d4");
   });
 });
 

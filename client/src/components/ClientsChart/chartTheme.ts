@@ -13,9 +13,9 @@ export const CHART_THEME_FALLBACKS: ChartTheme = {
   axis: "rgba(20, 20, 19, 0.12)",
   cursor: "rgba(20, 20, 19, 0.04)",
   seriesPalette: [
-    "#c9b8e8",
-    "#f0c4d8",
-    "#b76e7e",
+    "#9b82d4",
+    "#d89ab3",
+    "#9a4f5f",
     "#8e8e8e",
     "#b4b4b3",
     "#c8c8c8",
