@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { sampleCompany } from "./fixtures/sampleCompany";
-import { buildVisibleRows } from "./tableRows";
+import {
+  buildVisibleRows,
+  collectDescendantIds,
+  toggleExpandedIds,
+} from "./tableRows";
 
 const companyId = sampleCompany.id;
 const branch1Id = sampleCompany.branches[0]!.id;
@@ -130,5 +134,64 @@ describe("buildVisibleRows", () => {
 
     expect(branch1?.values[0]).toBe(147);
     expect(branch1?.values[11]).toBe(214);
+  });
+});
+
+describe("toggleExpandedIds", () => {
+  it("adds a collapsed id when expanding", () => {
+    const next = toggleExpandedIds(
+      sampleCompany,
+      new Set([companyId]),
+      branch1Id,
+    );
+
+    expect([...next].sort()).toEqual([branch1Id, companyId].sort());
+  });
+
+  it("removes the id and all descendants when collapsing", () => {
+    const open = new Set([companyId, branch1Id, annaId]);
+    const next = toggleExpandedIds(sampleCompany, open, branch1Id);
+
+    expect(next.has(branch1Id)).toBe(false);
+    expect(next.has(annaId)).toBe(false);
+    expect(next.has(companyId)).toBe(true);
+  });
+
+  it("collapsing the company clears every nested expanded id", () => {
+    const open = new Set([companyId, branch1Id, annaId]);
+    const next = toggleExpandedIds(sampleCompany, open, companyId);
+
+    expect(next.size).toBe(0);
+  });
+
+  it("re-expanding a parent does not restore cleared children", () => {
+    const afterCollapse = toggleExpandedIds(
+      sampleCompany,
+      new Set([companyId, branch1Id, annaId]),
+      companyId,
+    );
+    const afterExpand = toggleExpandedIds(
+      sampleCompany,
+      afterCollapse,
+      companyId,
+    );
+
+    expect([...afterExpand]).toEqual([companyId]);
+    expect(
+      buildVisibleRows(sampleCompany, afterExpand).map((row) => row.name),
+    ).toEqual(["Company", "Branch 1", "Branch 2", "Branch 3"]);
+  });
+});
+
+describe("collectDescendantIds", () => {
+  it("lists nested ids under Branch 1", () => {
+    const ids = collectDescendantIds(sampleCompany, branch1Id);
+
+    expect(ids).toContain(annaId);
+    expect(ids).toContain(jamesId);
+    expect(ids).toContain(
+      sampleCompany.branches[0]!.employees![0]!.channels![0]!.id,
+    );
+    expect(ids).not.toContain(branch1Id);
   });
 });

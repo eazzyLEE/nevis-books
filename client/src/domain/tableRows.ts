@@ -12,10 +12,79 @@ export interface TableRow {
   kind: TableRowKind;
 }
 
+/** Ids of every node nested under `nodeId` (not including `nodeId` itself). */
+export function collectDescendantIds(
+  company: Company,
+  nodeId: string,
+): string[] {
+  if (company.id === nodeId) {
+    const ids: string[] = [];
+
+    for (const branch of company.branches) {
+      ids.push(branch.id);
+
+      for (const employee of branch.employees ?? []) {
+        ids.push(employee.id);
+
+        for (const channel of employee.channels ?? []) {
+          ids.push(channel.id);
+        }
+      }
+    }
+
+    return ids;
+  }
+
+  for (const branch of company.branches) {
+    if (branch.id === nodeId) {
+      const ids: string[] = [];
+
+      for (const employee of branch.employees ?? []) {
+        ids.push(employee.id);
+
+        for (const channel of employee.channels ?? []) {
+          ids.push(channel.id);
+        }
+      }
+
+      return ids;
+    }
+
+    for (const employee of branch.employees ?? []) {
+      if (employee.id === nodeId) {
+        return (employee.channels ?? []).map((channel) => channel.id);
+      }
+    }
+  }
+
+  return [];
+}
+
 /**
- * Flatten the company tree to rows visible under `expandedIds`.
- * Expanded ids that aren't reachable (parent collapsed) are ignored.
+ * Expand adds `rowId`; collapse removes it and every descendant so
+ * re-expanding shows children collapsed again.
  */
+export function toggleExpandedIds(
+  company: Company,
+  current: ReadonlySet<string>,
+  rowId: string,
+): Set<string> {
+  const next = new Set(current);
+
+  if (next.has(rowId)) {
+    next.delete(rowId);
+
+    for (const descendantId of collectDescendantIds(company, rowId)) {
+      next.delete(descendantId);
+    }
+  } else {
+    next.add(rowId);
+  }
+
+  return next;
+}
+
+/** Flatten the company tree to rows visible under `expandedIds`. */
 export function buildVisibleRows(
   company: Company,
   expandedIds: ReadonlySet<string>,

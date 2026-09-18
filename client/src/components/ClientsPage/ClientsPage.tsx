@@ -1,25 +1,13 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { buildChartSeries } from "../../domain/chartSeries";
-import { buildVisibleRows } from "../../domain/tableRows";
+import {
+  buildVisibleRows,
+  toggleExpandedIds,
+} from "../../domain/tableRows";
 import { useClients } from "../../hooks/useClients";
 import { ClientsChart } from "../ClientsChart";
 import { ClientsTable } from "../ClientsTable";
 import styles from "./ClientsPage.module.css";
-
-function toggleExpandedId(
-  current: ReadonlySet<string>,
-  rowId: string,
-): Set<string> {
-  const next = new Set(current);
-
-  if (next.has(rowId)) {
-    next.delete(rowId);
-  } else {
-    next.add(rowId);
-  }
-
-  return next;
-}
 
 function StatusMessage({
   children,
@@ -101,9 +89,11 @@ export function ClientsPage() {
             rows={visibleRows}
             expandedIds={activeExpandedIds}
             onToggleExpand={(rowId) => {
+              const company = clients.data;
               setExpandedIds((current) =>
-                toggleExpandedId(
-                  current ?? (companyId ? new Set([companyId]) : new Set()),
+                toggleExpandedIds(
+                  company,
+                  current ?? new Set([company.id]),
                   rowId,
                 ),
               );
