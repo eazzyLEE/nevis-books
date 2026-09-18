@@ -23,8 +23,18 @@ describe("App", () => {
     expect(
       screen.getByText("Book of business · Feb 2024–Jan 2025"),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("Client acquisition over time")).toBeInTheDocument();
-    expect(screen.getByLabelText("Client detail by month")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Acquisition over time" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Detail by month" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Acquisition over time" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Detail by month" }),
+    ).toBeInTheDocument();
 
     await waitFor(() => {
       expect(

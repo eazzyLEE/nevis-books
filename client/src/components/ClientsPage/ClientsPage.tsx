@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { MONTH_LABELS } from "@nevis-books/shared";
 import { buildChartSeries } from "../../domain/chartSeries";
 import {
@@ -37,6 +37,8 @@ function StatusMessage({
 }
 
 export function ClientsPage() {
+  const chartHeadingId = useId();
+  const tableHeadingId = useId();
   const clients = useClients();
   const companyId = clients.status === "success" ? clients.data.id : null;
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<string> | null>(
@@ -100,9 +102,17 @@ export function ClientsPage() {
 
       <section
         className={styles.panel}
-        aria-label="Client acquisition over time"
+        aria-labelledby={chartHeadingId}
         aria-busy={isLoading}
       >
+        <div className={styles.panelHeader}>
+          <h2 id={chartHeadingId} className={styles.panelTitle}>
+            Acquisition over time
+          </h2>
+          <p className={styles.panelDescription}>
+            Stacked clients by acquisition channel
+          </p>
+        </div>
         {isLoading ? (
           <StatusMessage>Loading chart…</StatusMessage>
         ) : null}
@@ -114,9 +124,17 @@ export function ClientsPage() {
 
       <section
         className={`${styles.panel} ${styles.tablePanel}`}
-        aria-label="Client detail by month"
+        aria-labelledby={tableHeadingId}
         aria-busy={isLoading}
       >
+        <div className={styles.panelHeader}>
+          <h2 id={tableHeadingId} className={styles.panelTitle}>
+            Detail by month
+          </h2>
+          <p className={styles.panelDescription}>
+            Expand the hierarchy to inspect branches, employees, and channels
+          </p>
+        </div>
         {isLoading ? (
           <StatusMessage>Loading table…</StatusMessage>
         ) : null}

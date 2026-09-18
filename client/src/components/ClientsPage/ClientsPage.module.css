@@ -56,9 +56,32 @@
   min-height: 12rem;
 }
 
+.panelHeader {
+  margin-bottom: 1rem;
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.panelDescription {
+  margin: 0.2rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
 .tablePanel {
-  padding: 0.75rem;
+  padding: 1rem 0.75rem 0.75rem;
   overflow: hidden;
+}
+
+.tablePanel .panelHeader {
+  padding: 0 0.5rem;
+  margin-bottom: 0.85rem;
 }
 
 .placeholder {
