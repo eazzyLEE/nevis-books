@@ -78,7 +78,14 @@ export function ClientsPage() {
     <main className={styles.page}>
       <header className={styles.header}>
         <div className={styles.titleRow}>
-          <span className={styles.diamond} aria-hidden="true" />
+          <img
+            className={styles.mark}
+            src="/favicon.svg"
+            alt=""
+            width={28}
+            height={28}
+            decoding="async"
+          />
           <h1 className={styles.title}>Clients</h1>
         </div>
         <p className={styles.subtitle}>

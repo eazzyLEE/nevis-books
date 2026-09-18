@@ -16,15 +16,14 @@
 .titleRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
-.diamond {
-  width: 0.65rem;
-  height: 0.65rem;
-  background: var(--color-accent);
-  transform: rotate(45deg);
+.mark {
+  width: 1.75rem;
+  height: 1.75rem;
   flex-shrink: 0;
+  border-radius: 0.35rem;
 }
 
 .title {
@@ -37,14 +36,14 @@
 
 .subtitle {
   margin: 0;
-  padding-left: calc(0.65rem + 0.5rem);
+  padding-left: calc(1.75rem + 0.6rem);
   font-size: 0.9375rem;
   color: var(--color-text-muted);
 }
 
 .meta {
   margin: 0;
-  padding-left: calc(0.65rem + 0.5rem);
+  padding-left: calc(1.75rem + 0.6rem);
   font-size: 0.8125rem;
   color: var(--color-text-muted);
 }
