@@ -19,7 +19,7 @@ npm test          # client Vitest suite
 npm run build     # shared → server → client
 ```
 
-`npm run dev` is the supported path. The API uses `tsx` in development; don’t rely on `npm start` for the demo.
+`npm run dev` is the supported path. The API uses `tsx` in development.
 
 By default `GET /api/clients` waits ~500ms so loading UI is visible. Override with `CLIENTS_DELAY_MS` (e.g. `0` or `1000`) on the server.
 
@@ -33,7 +33,7 @@ npm workspaces:
 | `server` | Express `GET /api/clients` (and a health check) |
 | `shared` | `Company` types, month labels, and the sample payload from the brief |
 
-No CSS framework — tokens in `client/src/styles/tokens.css`, then CSS modules. Vite proxies `/api` to the Express server.
+CSS tokens are in `client/src/styles/tokens.css`, then CSS modules. Vite proxies `/api` to the Express server.
 
 ### How the client is split
 
@@ -57,13 +57,13 @@ ClientsPage (compose)
               useClients → fetchClients → GET /api/clients
 ```
 
-`ClientsPage` mostly composes. Expansion is a `Set` of open ids (no global store). Default: Company open, everything under it closed — same as the first design frame. Collapsing a parent also clears its descendants so a re-expand doesn’t resurrect nested open state.
+`ClientsPage` mostly composes. Expansion is a `Set` of open ids (no global store). Default: Company open, everything under it closed- same as the first design frame. Collapsing a parent also clears its descendants so a re-expand doesn’t resurrect nested open state.
 
 ## Assumptions
 
 These are the calls the brief left open, and why I landed where I did.
 
-**Chart vs table numbers.** The chart stacks **acquisition channels**, summed by channel name across the tree. The table shows each node’s own `values`. In the sample data only Anna Blackwood has channels, so chart totals are smaller than company/branch totals. I think that’s the right read of “acquisition over time,” but it’s also the biggest place the brief’s data and the design totals can disagree — see Open questions.
+**Chart vs table numbers.** The chart stacks **acquisition channels**, summed by channel name across the tree. The table shows each node’s own `values`. In the sample data only Anna Blackwood has channels, so chart totals are smaller than company/branch totals. I think that’s the right read of “acquisition over time,” but it’s also the biggest place the brief’s data and the design totals can disagree (see Open questions).
 
 **Uneven tree.** Branch 2 and Branch 3 have no employees; only Anna has channels. Rows without children simply omit the expand control.
 
@@ -81,7 +81,7 @@ These are the calls the brief left open, and why I landed where I did.
 
 Expand/collapse uses native buttons with `aria-expanded` (keyboard: Enter / Space). Rows expose `aria-level` for the hierarchy. The Recharts plot is treated as decorative; there’s a figcaption plus a visually hidden month × series data table for screen readers. Month headers are focusable so the highlight sync works from the keyboard too. Chevron animation and skeleton pulse respect `prefers-reduced-motion`.
 
-I didn’t implement a full `treegrid` arrow-key model — the expand control is the primary keyboard path. That felt like the right cut for the timebox; it’s listed under next steps if hierarchy navigation becomes a hard requirement.
+I didn’t implement a full `treegrid` arrow-key model- the expand control is the primary keyboard path. That felt like the right cut for the timebox; it’s listed under next steps if hierarchy navigation becomes a hard requirement.
 
 ## Tests
 
@@ -91,7 +91,7 @@ npm test
 
 Coverage includes chart aggregation, summary metrics, visible-row flattening (including collapse-clears-descendants), `useClients` states, expand control / table / chart UI (including the accessible data table), page-level error + retry, and month-highlight helpers.
 
-TypeScript is strict (`strict`, unused checks, `noUncheckedIndexedAccess`, etc.). There’s no ESLint/Prettier config yet — I’d add that (or Biome) with CI if this lived past the exercise.
+TypeScript is strict (`strict`, unused checks, `noUncheckedIndexedAccess`, etc.). There’s no ESLint/Prettier config yet — I’d add that with CI if this lived past the exercise.
 
 ## Open questions
 
